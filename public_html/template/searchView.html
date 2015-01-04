@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<div class="container" ng-controller="searchViewCtrl">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for music" ng-model="params" ng-keypress="search(params)">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="search(content)">Search</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row searchRow">
+        <div class="col-md-5" ng-controller="searchViewCtrl">
+            <ul class="list-group">
+                <li class="list-group-item" ng-model="Data.tracks" ng-click="prepForPlayback(track)" ng-repeat="track in Data.tracks">{{track.title}}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+

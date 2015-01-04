@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<div class="container" ng-controller="listenViewCtrl">
+    <div class="row">
+        <div class="col-md-5">
+            <ul class="list-group">
+                <li class="list-group-item" ng-click="listenTo(user.$id)" ng-model="users" ng-repeat="user in users | filter:{online:true}">{{user.$id}}</li>
+            </ul>
+        </div>
+    </div>
+</div>

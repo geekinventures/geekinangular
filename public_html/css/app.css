@@ -1,0 +1,113 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Dec 28, 2014, 3:33:54 PM
+    Author     : barre_000
+*/
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 120px;
+  margin-top: 80px;
+}
+.navbar {
+    background-color: #333;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 100px;
+  background-color: #333;
+}
+
+body > .container {
+    padding: 60px 15px 0;
+}
+.container .text-muted {
+    margin: 20px 0;
+}
+.searchRow {
+    margin-top: 10px;
+}
+
+.footer > .container{
+    padding-right: 15px;
+    padding-left: 15px;
+}
+.progress {
+    background-color: black;
+    color: black;
+    height: 3px;
+    border: 10px;
+    margin-top: 15px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    padding-right: 0px;
+    padding-left: 0px;
+}
+.progress-bar {
+    background-image: 'none';
+    background-color: orange;
+    color: black;
+    height: 3px;
+}
+.code {
+    font-size: 80%;
+}
+.white {
+    color: white;
+}
+.glyphicon {
+    color: white;
+}
+span.glyphicon {
+    margin: 15px;
+    font-size: 3.0em;
+}
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+.playbar {
+  width: auto;
+  /*max-width: 680px;*/
+  padding: 0 10px;
+  margin: 10px 10px;
+}
+.btn-group {
+    padding: 10px;
+}
+
+.post-content {
+    background: none repeat scroll 0 0 black;
+    opacity: 0.8;
+    margin: 0 auto;
+    margin-top: -54px;
+    text-align:center;
+    position: relative;
+    width:30%; 
+}
+.thumbnail {
+    margin:0 auto;
+    text-align:center;
+    border: 0 none;
+    box-shadow: none;
+}
+.thumbnail-text{
+    color: orange;
+}
+.wrapper {
+    text-align:center;
+}
