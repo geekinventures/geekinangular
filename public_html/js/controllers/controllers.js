@@ -8,9 +8,7 @@ var geekinViewControllers = angular.module('geekinViewControllers', []);
 
 /*
  * ==== Factories =====
- */
-
-/*
+ *
  * Data that is centrally shared throughout the application. Stores user specific
  * information such as username.  
  */
@@ -217,18 +215,15 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     // === Shared Controller Data variables === //
     $scope.Data = Data;
     $scope.fbData = $firebase(fbRef.child($scope.Data.username)); // this is the users station info
-    
-    console.log("playbar loaded");
+
     var newSkew = new Firebase("https://geekinapp.firebaseio.com/.info/serverTimeOffset");    
     var skewTime = $firebase(newSkew).$asObject();
-    console.log("skewArray", skewTime);
     
     //set initial status to offline until user clicks 'play' 
     $scope.fbData.$set({online:false}).then(function(ref){
         var id = ref.key();
         console.log("init online status set to false for user", id);
     });
-    
 
     $scope.currentSong = null;
     
@@ -237,8 +232,7 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     //auto playing does not work on iOS this must be done through another event
     $scope.$on('startPlayingSong', function(event){
         $scope.playbarData = playbarData;
-        console.log("playbardata");
-        console.log($scope.playbarData);
+
         //init playing of track
         $scope.loadTrack($scope.playbarData.currentTrackData.id);
         
@@ -301,8 +295,8 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
             $scope.isPlaying = $scope.currentSong.paused;
             $scope.fbData.$update({online:!$scope.currentSong.paused});
             $scope.getTrackSyncPosition();
-            
         }
+
         if(playBtnToggled === true){
 //            $scope.currentSong.togglePause();
             //reset sync time and reposition
@@ -334,8 +328,8 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
                 });
             });
         });
-        //broadcasters start time
     };
+
     //remove later
     $scope.pauseTrack = function(){
         if($scope.currentSong !== null){
