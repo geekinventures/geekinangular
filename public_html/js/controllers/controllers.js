@@ -22,6 +22,7 @@ geekinViewControllers.factory('Data', function($rootScope){
     sharedService.tracks = [];
     sharedService.bytesLoaded = 0;
     sharedService.bytesTotal = 0;
+    sharedService.playlists = [];
     
     //===== Ingest Data =====
     sharedService.prepForDataEmit = function(loaded, total){
@@ -74,14 +75,32 @@ geekinViewControllers.factory('playbarData', function($rootScope){
  * Watches for pause/play events, song changes, and number of listeners
  * currently attached to your broadcast! 
  */
-geekinViewControllers.factory('firebaseWatch', function($rootScope, $firebase){
+geekinViewControllers.factory('firebaseWatch', function($rootScope, $firebase, Data){
+
     var firebaseWatchService = {};
+    firebaseWatchService.fbRef = new Firebase("https://geekinapp.firebaseio.com/station/"+Data.username+"/playlists");
+    firebaseWatchService.fbPlaylists = $firebase(firebaseWatchService.fbRef).$asObject();
+
+    firebaseWatchService.playlists = [];
+    firebaseWatchService.fbPlaylists.$bindTo($rootScope, 'playlists').then(function(){
+        firebaseWatchService.playlists = $rootScope.playlists;
+        firebaseWatchService.fbRef.set({test:"test"});
+    });
+
     firebaseWatchService.pausePlayEvent = false;
     firebaseWatchService.listenerCountHasChangedTo = 0;
-    
+
+
+    //watch firebase for remote pause play event (broadcaster pauses song or plays song
     firebaseWatchService.remotePlayEventOccurred = function(){
         $rootScope.$broadcast('remotePausePlayEvent', firebaseWatchService.pausePlayEvent);
     };
+
+    //watch firebase for changes in listener count
+    firebaseWatchService.listenerCountChanged = function(){
+        $rootScope.$broadcast('listenerCountHasChanged', firebaseWatchService.listenerCountHasChangedTo);
+    }
+    return firebaseWatchService;
 });
 // === End Factories ======
 
@@ -169,8 +188,28 @@ geekinViewControllers.controller('searchViewCtrl', function($scope, Data, playba
 /*
  * handles playlist creation and saving to firebase
  */
-geekinViewControllers.controller('playlistViewCtrl', function($scope){
+geekinViewControllers.controller('playlistViewCtrl', function($scope, firebaseWatch){
+    //create three way binding to playlists and update them once they are change
+
+
+    /*
+     * playlist object will have the following:
+     * key/value pairs
+     * playlist_name: name
+     * tracks: [] <-- contains just the track ID provided by SC minimize the amount of data required
+     */
     
+});
+
+/*
+ * Handles the editing and order arangement of playlist tracks.  Allows users to rename their playlist.
+ * Playlists is bound to firebase, any change will update firebase as well
+ */
+
+geekinViewControllers.controller('playlistEditViewCtrl', function($scope, $firebase, firebaseWatch){
+    //Todo: Add methods to edit playlist and you need to add a route ID (playlist name) to edit.
+    //playlists will have a unique "name" so users wont have key value pair collisions.
+    //Todo: validate and check for key collisions for playlist names
 });
 
 /*
@@ -329,21 +368,11 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
                             syncLimit += 1;
                             this.setPosition(skew-snap.val().server_time);
                         }
+                        //tell the status bar to update
                         Data.prepForDataEmit(this.position, this.duration);
                     }
                 });
             });
         });
-        //broadcasters start time
     };
-    //remove later
-    $scope.pauseTrack = function(){
-        if($scope.currentSong !== null){
-            $scope.currentSong.togglePause();
-            $scope.isPlaying = $scope.currentSong.paused;
-        }else{
-            alert("You aren't playing any song");
-        }
-    };
-
 });
