@@ -6,6 +6,7 @@
 
 var geekinApp = angular.module('geekinApp', ['ngRoute', 'geekinViewControllers', 'firebase']);
 //TODO: Add /playlists/edit/{playlistname} to routes
+geekinApp.constant('FIREBASE_URL', 'https://geekinapp.firebaseio.com/');
 geekinApp.config(['$routeProvider', function($routeProvider){
         $routeProvider.
                 when('/search', {

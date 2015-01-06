@@ -8,17 +8,17 @@
 geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarData, $element, $firebase){
     var playBtnToggled = false; //because pausing is diffucult need to track when the user presses play vs. when they want to pause
     // contains the list of online users
-    var fbRef = new Firebase('https://geekinapp.firebaseio.com/onlineusers');
+    var fbRef = new Firebase(FIREBASE_URL+'onlineusers');
 
     // contains the broadcast data, song info, and server synch time.
-    var fbStationRef = new Firebase('https://geekinapp.firebaseio.com/station');
+    var fbStationRef = new Firebase(FIREBASE_URL+'station');
 
     // === Shared Controller Data variables === //
     $scope.Data = Data;
     $scope.fbData = $firebase(fbRef.child($scope.Data.username)); // this is the users station info
 
     console.log("playbar loaded");
-    var newSkew = new Firebase("https://geekinapp.firebaseio.com/.info/serverTimeOffset");
+    var newSkew = new Firebase(FIREBASE_URL+".info/serverTimeOffset");
     var skewTime = $firebase(newSkew).$asObject();
     console.log("skewArray", skewTime);
 
@@ -36,8 +36,7 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     //auto playing does not work on iOS this must be done through another event
     $scope.$on('startPlayingSong', function(event){
         $scope.playbarData = playbarData;
-        console.log("playbardata");
-        console.log($scope.playbarData);
+
         //init playing of track
         $scope.loadTrack($scope.playbarData.currentTrackData.id);
 
@@ -54,7 +53,6 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     $scope.$on('bytesLoaded', function(){
         if(Data.bytesLoaded === 100){
             console.log("Song has completely loaded");
-            alert("song loaded");
         }
     }, true);
 
@@ -110,18 +108,19 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     }; //play
 
     $scope.getTrackSyncPosition = function(){
+        //reset playbar data to zero
+        Data.prepForDataEmit(0,0);
+
         //skew time
-        var skewRef = new Firebase("https://geekinapp.firebaseio.com/.info/serverTimeOffset");
+        var skewRef = new Firebase(FIREBASE_URL+".info/serverTimeOffset");
         skewRef.once('value', function(snapshot){
-            console.log(snapshot.val());
+            //console.log(snapshot.val());
             var skew = new Date().getTime() + snapshot.val();
-            console.log("skew", skew);
-            var userRef = new Firebase("https://geekinapp.firebaseio.com/station/"+$scope.playbarData.currentlyListeningToo);
+            //console.log("skew", skew);
+            var userRef = new Firebase(FIREBASE_URL+"station/"+$scope.playbarData.currentlyListeningToo);
             userRef.once('value', function(snap){
-                console.log(snap.val());
                 console.log("should start here", skew - snap.val().server_time);
                 var syncLimit = 0;
-
                 $scope.currentSong.play({
                     whileplaying: function(){
                         if(syncLimit < 5){
