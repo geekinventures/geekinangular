@@ -108,6 +108,9 @@ span.glyphicon {
 .thumbnail-text{
     color: orange;
 }
+.playlist_name_group{
+    font-size: 0.6em;
+}
 .wrapper {
     text-align:center;
 }

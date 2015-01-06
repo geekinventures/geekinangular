@@ -14,11 +14,14 @@ geekinApp.config(['$routeProvider', function($routeProvider){
                 }).
                 when('/listen', {
                     templateUrl: 'template/listenView.html',
-                    controller: 'listenViewCtrl',
+                    controller: 'listenViewCtrl'
                 }).
                 when('/playlists', {
                     templateUrl: 'template/playlistView.html',
-                    controller: 'playlistViewCtrl',
+                    controller: 'playlistViewCtrl'
+                }).when('/playlists/edit', {
+                    templateUrl: 'template/playlistEditView.html',
+                    controller: 'playlistEditViewCtrl'
                 }).
                 otherwise({
                     redirectTo: '/'

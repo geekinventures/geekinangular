@@ -1,5 +1,51 @@
 <!-- Template for editing playlists -->
 <!-- TODO: Complete the template for playlist editor -->
 <div class="container" ng-controller="playlistEditViewCtrl">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search and add songs!" ng-model="searchParams" ng-keypress="search(searchParams)">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="search(searchParams)">Search</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row searchRow">
+        <div class="col-md-5" ng-controller="playlistEditViewCtrl">
+            <ul class="list-group">
+                <li class="list-group-item" ng-model="tracks" ng-click="addToPlaylist(track)" ng-repeat="track in tracks">{{track.title}}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- items in playlist -->
+<div class="container" ng-controller="playlistEditViewCtrl">
+    <div class="row">
+        <div class="col-md-5">
+            <h1>Songs in your playlist</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <p>Total Songs:{{totalSongs}}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-addon playlist_name_group" id="sizing-addon3">Playlist Name:</span>
+                <input type="text" class="form-control" placeholder="Title" ng-model="playlistTitle" ng-keypress="setPlaylistTitle(playlistTitle)">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <ul class="list-group">
+                <li class="list-group-item" ng-model="playlists.tracks" ng-repeat="track in playlists">{{track}}</li>
+            </ul>
+        </div>
+    </div>
 
 </div>
