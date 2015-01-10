@@ -5,7 +5,7 @@
  * Handles the playback and control of sound and synchronization
  * writes to firebase database and turns the users as 'online' when playing music
  */
-geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarData, $element, $firebase){
+geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarData, $element, $firebase, FIREBASE_URL){
     var playBtnToggled = false; //because pausing is diffucult need to track when the user presses play vs. when they want to pause
     // contains the list of online users
     var fbRef = new Firebase(FIREBASE_URL+'onlineusers');
@@ -70,7 +70,7 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
         SC.initialize({
             client_id:'0f0e321b9652115f3a8ea04f5030f9c0'
         });
-        /* === disabled for testing firebase services === */
+
         SC.stream("/tracks/"+trackId, function(sound){
             $scope.currentSong = sound; //give access to the song for pause/play
             $scope.currentSong.load({
@@ -83,7 +83,6 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     }; //playTrack
 
     //iOS devices do not allow onload function so we have to manually
-    //start the song once it's loaded completely.
     $scope.play = function(){
         console.log("play song triggered");
         //when user plays they will re-sync with server and calculate the
@@ -107,11 +106,17 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
         }
     }; //play
 
+    //a broadcaster will 'subscribe' to themselves in order to sync with the other devices
     $scope.getTrackSyncPosition = function(){
+        //update server and set the current start time for the broadcaster
+        $scope.fbStationData.$set({currentlyPlaying:$scope.playbarData.currentTrackData.id,
+            server_time:Firebase.ServerValue.TIMESTAMP});
+
         //reset playbar data to zero
         Data.prepForDataEmit(0,0);
 
-        //skew time
+        //skew time calculates how far off the client time is from the server
+        //this is a crucial calculation and it enables the synchronization to work
         var skewRef = new Firebase(FIREBASE_URL+".info/serverTimeOffset");
         skewRef.once('value', function(snapshot){
             //console.log(snapshot.val());
