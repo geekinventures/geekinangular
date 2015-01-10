@@ -28,7 +28,7 @@ geekinViewControllers.factory('Data', function($rootScope){
     sharedService.prepForDataEmit = function(loaded, total){
         this.bytesLoaded = loaded;
         this.bytesTotal = total;
-        this.broadcastSongData()();
+        this.broadcastSongData();
     };
     sharedService.prepForBroadcast = function(msg){
         this.message = msg;
