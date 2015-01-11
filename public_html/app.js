@@ -24,6 +24,10 @@ geekinApp.config(['$routeProvider', function($routeProvider){
                     templateUrl: 'template/playlistEditView.html',
                     controller: 'playlistEditViewCtrl'
                 }).
+                when('/login', {
+                    templateUrl: 'template/loginView.html',
+                    controller: 'loginViewCtrl'
+                }).
                 otherwise({
                     redirectTo: '/'
                 });

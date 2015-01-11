@@ -36,6 +36,7 @@ and open the template in the editor.
         <!-- angular controllers -->
         <script src="js/controllers/controllers.js" type="text/javascript"></script>
         <script src="js/controllers/playbar_controller.js" type="text/javascript"></script>
+        <script src="js/controllers/loginViewController.js" type="text/javascript"></script>
         <!-- angular factories -->
         <script src="js/factories/playbar_data.js" type="text/javascript"></script>
         
@@ -52,7 +53,9 @@ and open the template in the editor.
         
     </head>
     <body ng-controller="mainCtrl">
-        <nav class="navbar navbar-inverse navbar-fixed-top">
+
+        <!-- navigation bar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" ng-show="showPage">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -72,10 +75,11 @@ and open the template in the editor.
                 </div>
             </div> <!-- nav bar container -->
         </nav>
+
         <!-- search, playlist, and broadcaster/listener views here -->
         <div ng-view></div>
 
-        <footer class="footer" ng-controller="playBarCtrl">
+        <footer class="footer" ng-controller="playBarCtrl" ng-show="showPage">
             <div class="container-fluid">
                 <div class="row">
                     <playbar-widget>

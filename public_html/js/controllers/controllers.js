@@ -17,22 +17,27 @@ var geekinViewControllers = angular.module('geekinViewControllers', []);
 geekinViewControllers.factory('Data', function($rootScope){
     var sharedService = {};
     //sharedService.username = 'liltimtim' + Math.random().toString().replace('.','') ; //this is temporary will be setup on login
-    sharedService.username = 'liltimtim';
+    sharedService.username = '';
+    sharedService.userHasLoggedIn = false;
     sharedService.message = '';
     sharedService.songId = '';
     sharedService.tracks = [];
     sharedService.bytesLoaded = 0;
     sharedService.bytesTotal = 0;
+    sharedService.showPage = false;
     
     //===== Ingest Data =====
     sharedService.prepForDataEmit = function(loaded, total){
         this.bytesLoaded = loaded;
         this.bytesTotal = total;
-        this.broadcastSongData()();
+        this.broadcastSongData();
     };
     sharedService.prepForBroadcast = function(msg){
-        this.message = msg;
-        this.broadcastItem();
+        sharedService.message = msg;
+        sharedService.broadcastItem();
+    };
+    sharedService.userLoggedIn = function(){
+        this.userHasLoggedIn = true;
     };
     
     //==== notify other controllers that are listening for events =====
@@ -42,6 +47,9 @@ geekinViewControllers.factory('Data', function($rootScope){
     sharedService.broadcastSongData = function(){
         $rootScope.$broadcast('bytesLoaded');
     };
+    sharedService.broadcastUserHasLoggedIn = function(){
+        $rootScope.$broadcast('userHasLoggedIn');
+    }
     return sharedService;
 });
 
@@ -125,9 +133,31 @@ geekinViewControllers.directive('progressBarWidget', function(Data){
  * Main Controller which handles all other controllers
  * Handles users navigation and interaction with app
  */
-geekinViewControllers.controller('mainCtrl', ['$route','$window', '$routeParams', '$location', '$scope', function($route, $window, $routeParams, $location, $scope){
-    $scope.whereAmI = "main view controller";    
-}]);
+geekinViewControllers.controller('mainCtrl', function($route, $window, $routeParams, $location, $scope, Data){
+    $scope.Data = Data;
+    $scope.showPage = Data.showPage;
+    if(Data.username === ''){
+        $location.url('/login');
+    }
+    $scope.$on('userHasLoggedIn', function(){
+        $scope.showPage = true;
+    });
+});
+
+geekinViewControllers.controller('loginViewCtrl', function(Data, $timeout, $location, $scope, $rootScope){
+    $scope.Data = Data;
+    console.log($scope.Data);
+    $scope.username = '';
+    $scope.login = function(){
+        Data.username = $scope.username;
+        Data.showPage = true;
+        $timeout(function(){
+            $rootScope.$broadcast('userHasLoggedIn');
+        });
+        $location.url('/');
+
+    };
+});
 
 /*
  * handles the searching view. When user clicks on a song it will begin playing
@@ -146,6 +176,9 @@ geekinViewControllers.controller('searchViewCtrl', function($scope, Data, playba
     });
     $scope.search = function(params){
         $scope.Data.tracks = [];
+
+        //bpm from 10 guarantees tracks are at least 10 beats per minute and prevents other media
+        //types from being returned.
         SC.get('/tracks', {q: params, bpm:{from: 10}}, function(tracks){
             //guarantees search results are updated while waiting on 
             //SC delivery of data. If apply isn't here it wont always update 

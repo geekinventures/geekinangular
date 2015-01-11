@@ -18,6 +18,7 @@ body {
   /* Margin bottom by footer height */
   margin-bottom: 120px;
   margin-top: 80px;
+  background-color: #333;
 }
 .navbar {
     background-color: #333;
@@ -33,6 +34,26 @@ body {
 
 body > .container {
     padding: 60px 15px 0;
+}
+.btn {
+    background-color: dimgrey;
+    color: darkorange;
+    border-color: #333;
+}
+.btn:hover {
+    background-color: grey;
+    color: darkorange;
+}
+.input-group span:focus {
+    border-color: #333;
+    !important;
+}
+
+.center-block {
+    float: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 .container .text-muted {
     margin: 20px 0;

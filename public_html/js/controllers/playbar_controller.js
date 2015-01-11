@@ -13,20 +13,25 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     // contains the broadcast data, song info, and server synch time.
     var fbStationRef = new Firebase(FIREBASE_URL+'station');
 
-    // === Shared Controller Data variables === //
-    $scope.Data = Data;
-    $scope.fbData = $firebase(fbRef.child($scope.Data.username)); // this is the users station info
 
-    console.log("playbar loaded");
-    var newSkew = new Firebase(FIREBASE_URL+".info/serverTimeOffset");
-    var skewTime = $firebase(newSkew).$asObject();
-    console.log("skewArray", skewTime);
 
-    //set initial status to offline until user clicks 'play'
-    $scope.fbData.$set({online:false}).then(function(ref){
-        var id = ref.key();
-        console.log("init online status set to false for user", id);
+    $scope.$on('userHasLoggedIn', function(){
+        // === Shared Controller Data variables === //
+        $scope.Data = Data;
+        $scope.fbData = $firebase(fbRef.child($scope.Data.username)); // this is the users station info
+        console.log("playbar loaded");
+        var newSkew = new Firebase(FIREBASE_URL+".info/serverTimeOffset");
+        var skewTime = $firebase(newSkew).$asObject();
+        console.log("skewArray", skewTime);
+
+        //set initial status to offline until user clicks 'play'
+        $scope.fbData.$set({online:false}).then(function(ref){
+            var id = ref.key();
+            console.log("init online status set to false for user", id);
+        });
     });
+
+
 
 
     $scope.currentSong = null;
@@ -133,7 +138,8 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
                             this.setPosition(skew-snap.val().server_time);
                         }
                         //tell the status bar to update
-                        Data.prepForDataEmit(this.position, this.duration);
+
+                        Data.prepForDataEmit(this.position/this.duration * 100, this.duration);
                     }
                 });
             });
