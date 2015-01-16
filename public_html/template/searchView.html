@@ -18,7 +18,7 @@ and open the template in the editor.
     <div class="row searchRow">
         <div class="col-md-5" ng-controller="searchViewCtrl">
             <ul class="list-group">
-                <li class="list-group-item" ng-model="Data.tracks" ng-click="prepForPlayback(track)" ng-repeat="track in Data.tracks">{{track.title}}</li>
+                <track-selector-widget></track-selection><li class="list-group-item" ng-model="Data.tracks" ng-click="prepForPlayback(track)" ng-repeat="track in Data.tracks">{{track.title}}</li></track-selector-widget>
             </ul>
         </div>
     </div>

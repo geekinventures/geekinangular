@@ -49,7 +49,7 @@ geekinViewControllers.factory('Data', function($rootScope){
     };
     sharedService.broadcastUserHasLoggedIn = function(){
         $rootScope.$broadcast('userHasLoggedIn');
-    }
+    };
     return sharedService;
 });
 
@@ -60,7 +60,6 @@ geekinViewControllers.factory('Data', function($rootScope){
 geekinViewControllers.factory('searchResultFactory', function($rootScope){
     var searchResultsFactoryService = {};
     searchResultsFactoryService.tracks = {};
-
     return searchResultsFactoryService;
 });
 
@@ -95,9 +94,10 @@ geekinViewControllers.factory('firebaseWatch', function($rootScope, $firebase, D
 
 // === Directives =====
 //handles the pause/play button switching glyphs
-geekinViewControllers.directive('playbarWidget', function(playbarData, $timeout){
+geekinViewControllers.directive('playbarWidget', function(playbarData, $timeout, Data){
     var linkFunction = function($scope, $element, $attributes){
         var glyphIcon = $element.children().children();
+
         $(glyphIcon).on("click", function(e){
             console.log("pauseplay button clicked");
             console.log(playbarData.currentSong);
@@ -136,6 +136,18 @@ geekinViewControllers.directive('progressBarWidget', function(Data){
         link: linkFunction
     };
 });
+
+geekinViewControllers.directive('trackSelectorWidget', function($document){
+    return function($scope, $element, $attr){
+        $element.on("mousedown", function(selected){
+            console.log($(selected.target));
+            $(selected.target).css("background-color", "grey");
+        });
+        $element.on("mouseup", function(selected){
+            $(selected.target).css("background-color", "white");
+        });
+    }
+});
 // === End Directives =====
 
 /*
@@ -163,7 +175,7 @@ geekinViewControllers.controller('loginViewCtrl', function(Data, $timeout, $loca
         $timeout(function(){
             $rootScope.$broadcast('userHasLoggedIn');
         });
-        $location.url('/');
+        $location.url('/search');
 
     };
 });
@@ -200,6 +212,7 @@ geekinViewControllers.controller('searchViewCtrl', function($scope, Data, playba
     $scope.prepForPlayback = function(trackInfo){
         //trackInfo contains ALL the SC return data 
         console.log(trackInfo);
+        alert("Now Loading "+trackInfo.title+" When song has loaded, press play to start!");
         //Setup the shared playbar data
         $scope.playbarData = playbarData;
         //broadcast to the playbar the user wants to play a song
@@ -284,12 +297,23 @@ geekinViewControllers.controller('listenViewCtrl', function($scope, Data, $fireb
     var fbOnlineUsersRef = new Firebase("https://geekinapp.firebaseio.com/onlineusers");
     var fbStationRef = new Firebase("https://geekinapp.firebaseio.com/station");
     var onlineusers = $firebase(fbOnlineUsersRef).$asArray();
-    $scope.users = onlineusers;
-    console.log("online users");
-    console.log(onlineusers);
+    var currentTime = new Date().getTime();
+    onlineusers.$loaded().then(function(users){
+        console.log(users[0].lastSeen);
+        for(var i = 0; i < users.length; i++){
+            console.log("time difference", new Date().getTime() - users[i].lastSeen);
+            if(currentTime - users[i].lastSeen < 300000){
+                $scope.users = users;
+            }else{
+                users.splice(i, 1);
+                $scope.users = users;
+            }
+        }
+    });
     $scope.listenTo = function(user){
         //initiate playing
         console.log("clicked on ", user);
+        alert("You are now listening too "+user+" when song is loaded press play to start");
         //need to prep for broadcast and get what the broadcaster is playing
         var broadcasterDataRef = $firebase(fbStationRef.child(user)).$asObject();
         broadcasterDataRef.$loaded().then(function(data){

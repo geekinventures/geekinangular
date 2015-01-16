@@ -24,7 +24,8 @@ geekinViewControllers.controller('playBarCtrl', function($scope, $timeout, Data,
         console.log("skewArray", skewTime);
 
         //set initial status to offline until user clicks 'play'
-        $scope.fbData.$set({online:false}).then(function(ref){
+
+        $scope.fbData.$set({online:false, lastSeen:new Date().getTime()}).then(function(ref){
             var id = ref.key();
             console.log("init online status set to false for user", id);
         });
@@ -92,7 +93,7 @@ geekinViewControllers.controller('playBarCtrl', function($scope, $timeout, Data,
         console.log("Prepping for song playback");
         console.log($scope.currentSong.position);
         //update server and set the current start time for the broadcaster
-        $scope.fbData.$update({online: !$scope.currentSong.paused});
+        $scope.fbData.$update({online: $scope.currentSong.paused, lastSeen: new Date().getTime()});
 
 
         //reset playbar data to zero
@@ -141,6 +142,7 @@ geekinViewControllers.controller('playBarCtrl', function($scope, $timeout, Data,
                                 if(syncLimit < 1){
                                     syncLimit += 1;
                                     $scope.currentSong.setPosition(skew - snap.val().server_time);
+                                    $scope.fbData.$update({online: true, lastSeen: new Date().getTime()});
                                 }
                             }, 5000);
                             //tell the status bar to update
