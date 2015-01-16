@@ -277,7 +277,7 @@ geekinViewControllers.controller('playlistEditViewCtrl', function($scope, $fireb
     //search SC for input params
     $scope.search = function(searchParams) {
         $scope.tracks = {};
-        SC.get('/tracks', {q: searchParams, bpm: {from: 10}}, function (tracks) {
+        SC.get('/tracks', {q: searchParams}, function (tracks) {
             //guarantees search results are updated while waiting on
             //SC delivery of data. If apply isn't here it wont always update
             //give 500 error
