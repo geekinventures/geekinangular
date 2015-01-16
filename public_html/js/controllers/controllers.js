@@ -95,14 +95,23 @@ geekinViewControllers.factory('firebaseWatch', function($rootScope, $firebase, D
 
 // === Directives =====
 //handles the pause/play button switching glyphs
-geekinViewControllers.directive('playbarWidget', function(){
+geekinViewControllers.directive('playbarWidget', function(playbarData, $timeout){
     var linkFunction = function($scope, $element, $attributes){
         var glyphIcon = $element.children().children();
         $(glyphIcon).on("click", function(e){
-            if($scope.isPlaying === false){
+            console.log("pauseplay button clicked");
+            console.log(playbarData.currentSong);
+            console.log("playbar widget song paused");
+            console.log(playbarData.currentSong.paused);
+            $timeout(function(){
+                console.log("timeout");
+            }, 1000);
+            if(playbarData.currentSong.paused === true){
+                console.log("play button", playbarData.isSongPaused);
                 $(this).attr("class", "glyphicon glyphicon-pause");
             }
-            if($scope.isPlaying === true){
+            if(playbarData.currentSong.paused === false){
+                console.log("pause button", playbarData.isSongPaused);
                 $(this).attr("class", "glyphicon glyphicon-play");
             }
         });
@@ -179,7 +188,7 @@ geekinViewControllers.controller('searchViewCtrl', function($scope, Data, playba
 
         //bpm from 10 guarantees tracks are at least 10 beats per minute and prevents other media
         //types from being returned.
-        SC.get('/tracks', {q: params, bpm:{from: 10}}, function(tracks){
+        SC.get('/tracks', {q: params}, function(tracks){
             //guarantees search results are updated while waiting on 
             //SC delivery of data. If apply isn't here it wont always update 
             //give 500 error

@@ -61,10 +61,12 @@ body > .container {
 .searchRow {
     margin-top: 10px;
 }
-
+.footer {
+    box-shadow: 0px 0px 10px rgba(0,0,0,.8);
+}
 .footer > .container{
-    padding-right: 15px;
-    padding-left: 15px;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 .progress {
     background-color: black;
@@ -95,7 +97,7 @@ body > .container {
 }
 span.glyphicon {
     margin: 15px;
-    font-size: 3.0em;
+    font-size: 1.5em;
 }
 /* Custom page CSS
 -------------------------------------------------- */

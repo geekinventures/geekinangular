@@ -15,6 +15,8 @@ geekinViewControllers.factory('playbarData', function($rootScope){
     var playbarService = {};
     playbarService.currentTrackData = null; //holds the SC track info
     playbarService.currentlyListeningToo = null;
+    playbarService.isSongPaused = true;
+    playbarService.currentSong = null;
 
     playbarService.prepForBroadcast = function(trackData, listeningToo){
         playbarService.currentTrackData = trackData;

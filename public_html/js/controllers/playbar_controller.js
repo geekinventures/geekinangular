@@ -5,15 +5,14 @@
  * Handles the playback and control of sound and synchronization
  * writes to firebase database and turns the users as 'online' when playing music
  */
-geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarData, $element, $firebase, FIREBASE_URL){
-    var playBtnToggled = false; //because pausing is diffucult need to track when the user presses play vs. when they want to pause
+geekinViewControllers.controller('playBarCtrl', function($scope, $timeout, Data, playbarData, $element, $firebase, FIREBASE_URL){
+
     // contains the list of online users
     var fbRef = new Firebase(FIREBASE_URL+'onlineusers');
 
     // contains the broadcast data, song info, and server synch time.
     var fbStationRef = new Firebase(FIREBASE_URL+'station');
-
-
+    $scope.hasBegunPlayingSong = false; //set init song playback value to false
 
     $scope.$on('userHasLoggedIn', function(){
         // === Shared Controller Data variables === //
@@ -40,6 +39,7 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
     //and playing the song that was set either from searchview or listenview
     //auto playing does not work on iOS this must be done through another event
     $scope.$on('startPlayingSong', function(event){
+        Data.prepForDataEmit(0,0); //reset playbar
         $scope.playbarData = playbarData;
 
         //init playing of track
@@ -85,64 +85,71 @@ geekinViewControllers.controller('playBarCtrl', function($scope, Data, playbarDa
                 }
             });
         });
-    }; //playTrack
+    };
 
     //iOS devices do not allow onload function so we have to manually
     $scope.play = function(){
-        console.log("play song triggered");
-        //when user plays they will re-sync with server and calculate the
-        //correct position to start at
-
-        //determine if a song is playing or not.  If a song is playing it will
-        //decide to either start the song (ios requires user action to start
-        //a song) or togglePause
-        if(playBtnToggled === false){
-            //song has not been played yet
-            playBtnToggled = true;
-            $scope.isPlaying = $scope.currentSong.paused;
-            $scope.fbData.$update({online:!$scope.currentSong.paused});
-            $scope.getTrackSyncPosition();
-
-        }
-        if(playBtnToggled === true){
-//            $scope.currentSong.togglePause();
-            //reset sync time and reposition
-            $scope.fbData.$update({online:!$scope.currentSong.paused});
-        }
-    }; //play
-
-    //a broadcaster will 'subscribe' to themselves in order to sync with the other devices
-    $scope.getTrackSyncPosition = function(){
+        console.log("Prepping for song playback");
+        console.log($scope.currentSong.position);
         //update server and set the current start time for the broadcaster
-        $scope.fbStationData.$set({currentlyPlaying:$scope.playbarData.currentTrackData.id,
-            server_time:Firebase.ServerValue.TIMESTAMP});
+        $scope.fbData.$update({online: !$scope.currentSong.paused});
+
 
         //reset playbar data to zero
         Data.prepForDataEmit(0,0);
+        if($scope.currentSong.position > 0){
+            console.log("song is already playing");
 
-        //skew time calculates how far off the client time is from the server
-        //this is a crucial calculation and it enables the synchronization to work
-        var skewRef = new Firebase(FIREBASE_URL+".info/serverTimeOffset");
-        skewRef.once('value', function(snapshot){
-            //console.log(snapshot.val());
-            var skew = new Date().getTime() + snapshot.val();
-            //console.log("skew", skew);
-            var userRef = new Firebase(FIREBASE_URL+"station/"+$scope.playbarData.currentlyListeningToo);
-            userRef.once('value', function(snap){
-                console.log("should start here", skew - snap.val().server_time);
-                var syncLimit = 0;
-                $scope.currentSong.play({
-                    whileplaying: function(){
-                        if(syncLimit < 5){
-                            syncLimit += 1;
-                            this.setPosition(skew-snap.val().server_time);
-                        }
-                        //tell the status bar to update
+            //recalc song position
+            var skewRef = new Firebase(FIREBASE_URL + ".info/serverTimeOffset");
+            skewRef.once('value', function(snapshot){
+                var skew = new Date().getTime() + snapshot.val();
+                console.log("skew data", skew, snapshot.val());
+                var userRef = new Firebase(FIREBASE_URL + "station/" + $scope.playbarData.currentlyListeningToo);
+                userRef.once('value', function(snap){
+                    $scope.currentSong.setPosition(skew - snap.val().server_time);
+                    console.log("current position paused", $scope.currentSong.position);
+                    console.log("skew info", skew - snap.val().server_time);
 
-                        Data.prepForDataEmit(this.position/this.duration * 100, this.duration);
-                    }
+                    $scope.currentSong.togglePause();
+                    playbarData.isSongPaused = $scope.currentSong.paused;
                 });
             });
-        });
-    };
+        } // if songposition === 0
+        if($scope.currentSong.position === null) {
+            playbarData.currentSong = $scope.currentSong;
+            //set time on start to server
+            $scope.fbStationData.$set({currentlyPlaying:$scope.playbarData.currentTrackData.id,
+                server_time:Firebase.ServerValue.TIMESTAMP});
+            //skew time calculates how far off the client time is from the server
+            //this is a crucial calculation and it enables the synchronization to work
+            var skewRef = new Firebase(FIREBASE_URL + ".info/serverTimeOffset");
+            skewRef.once('value', function (snapshot) {
+                //console.log(snapshot.val());
+                var skew = new Date().getTime() + snapshot.val();
+                //console.log("skew", skew);
+                var userRef = new Firebase(FIREBASE_URL + "station/" + $scope.playbarData.currentlyListeningToo);
+                userRef.once('value', function (snap) {
+                    console.log("should start here", skew - snap.val().server_time);
+                    var syncLimit = 0;
+                    console.log("starting playback of this song");
+                    console.log($scope.currentSong);
+                    $scope.currentSong.play({
+                        whileplaying: function () {
+                            $timeout(function(){
+                                //var syncLimit = 0;
+                                if(syncLimit < 1){
+                                    syncLimit += 1;
+                                    $scope.currentSong.setPosition(skew - snap.val().server_time);
+                                }
+                            }, 5000);
+                            //tell the status bar to update
+                            //console.log(this.position/this.duration*100);
+                            Data.prepForDataEmit(this.position / this.duration * 100, this.duration);
+                        }
+                    });
+                });
+            });
+        }// if scope === null condition
+    }; //play
 });

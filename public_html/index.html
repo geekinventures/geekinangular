@@ -83,9 +83,19 @@ and open the template in the editor.
             <div class="container-fluid">
                 <div class="row">
                     <playbar-widget>
-                        <div class="col-xs-4">
+                        <!-- album art -->
+                        <div class="col-sm-4">
+
+                        </div>
+                        <div class="col-xs-2">
+                            <span id="backIcon" ng-click="back()" class="glyphicon glyphicon-backward"></span>
+                        </div>
+                        <div class="col-xs-2">
                             <span id="playIcon" ng-click="play()" class="glyphicon glyphicon-play"></span>
-                        </div>  
+                        </div>
+                        <div class="col-xs-2">
+                            <span id="forwardIcon" ng-click="forward()" class="glyphicon glyphicon-forward"></span>
+                        </div>
                     </playbar-widget>>
                 </div>
                 <div class="row">
